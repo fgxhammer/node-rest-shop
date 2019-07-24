@@ -1,10 +1,13 @@
 const express = require('express')
 const app = express()
-const productRoutes = require('./api/routes/products')
-const orderRoutes = require('./api/routes/orders')
 const morgan = require('morgan')
 const bodyParser = require('body-parser')
 const mongoose = require('mongoose')
+
+//Routes
+const productRoutes = require('./api/routes/products')
+const orderRoutes = require('./api/routes/orders')
+const userRoutes = require('./api/routes/users')
 
 //Connect to mongoDB on localhost:27017
 mongoose.connect('mongodb://localhost:' + process.env.MONGODB_PORT + '/rest-shop')
@@ -35,6 +38,7 @@ app.use((req, res, next) => {
 app.use('/uploads', express.static('uploads'))
 app.use('/products', productRoutes)
 app.use('/orders', orderRoutes)
+app.use('/users', userRoutes)
 
 //Handles errors when no routes found
 app.use((req, res, next) => {
