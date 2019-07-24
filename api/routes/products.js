@@ -2,13 +2,43 @@ const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
 const Product = require('../models/product');
+const multer = require('multer')
 
+
+// multer file upload configuration
+const storage = multer.diskStorage({
+	destination: (req, file, cb) => {
+		cb(null, './uploads')
+	},
+	filename: (req, file, cb) => {
+		cb(null, new Date().toISOString() + file.originalname)
+	}
+})
+const fileFilter = (req, file, cb) => {
+	if(file.mimetype === "image/jpeg" || file.mimetype === "image/png") {
+		// Accept file
+		cb(null, true)
+	} else {
+		// Reject file
+		cb(null, false)
+	}
+}
+const upload = multer({
+	storage: storage,
+	limits: {
+		fileSize: 1024 * 1024 *5 //filesize in bytes (5Mb)
+	},
+	fileFilter: fileFilter
+}) 
+
+// DEV: Port constant for localhost
 const PORT = 3000
 
+// GET
 // Get all products
 router.get('/', (req, res, next) => {
 	Product.find()
-		.select("name price _id") //Query string for fields
+		.select("name price _id productImage") //Query string for fields
 		.exec()
 		.then(docs => {
 			const response = {
@@ -17,6 +47,7 @@ router.get('/', (req, res, next) => {
 					return {
 						name: doc.name,
 						price: doc.price,
+						productImage: doc.productImage,
 						id: doc._id,
 						request: {
 							type: "GET",
@@ -35,12 +66,15 @@ router.get('/', (req, res, next) => {
 		})
 })
 
+// POST
 // Create new product
-router.post('/', (req, res, next) => {
+router.post('/', upload.single('productImage'), (req, res, next) => {
+	console.log(req.file)
 	const product = new Product({
 		_id: new mongoose.Types.ObjectId(),
 		name: req.body.name,
-		price: req.body.price
+		price: req.body.price,
+		productImage:  req.file.path
 	})
 	product
 		.save()
@@ -66,12 +100,13 @@ router.post('/', (req, res, next) => {
 		})
 })
 
+// GET
 // Get product with id
 router.get('/:productId', (req, res, next) => {
 	const id = req.params.productId;
 	Product
 		.findById(id)
-		.select("name price _id")
+		.select("name price _id productImage")
 		.exec()
 		.then(doc => {
 			if(doc) {
@@ -97,6 +132,7 @@ router.get('/:productId', (req, res, next) => {
 		})
 })
 
+// PATCH
 // Update existing product with id
 router.patch('/:productId', (req, res, next) => {
 	const id = req.params.productId
@@ -123,6 +159,7 @@ router.patch('/:productId', (req, res, next) => {
 		})
 })
 
+// DELETE
 // Delete producs with id
 router.delete('/:productId', (req, res, next) => {
 	const id = req.params.productId
