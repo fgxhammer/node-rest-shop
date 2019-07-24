@@ -1,5 +1,5 @@
-const express = require('express');
-const router = express.Router();
+const express = require('express')
+const router = express.Router()
 const mongoose = require('mongoose')
 const Order = require('../models/order')
 const Product = require('../models/product')
@@ -42,7 +42,7 @@ router.get('/:orderId', (req, res, next) => {
 		.populate("product")
 		.exec()
 		.then(order => {
-			if(!order) {
+			if (!order) {
 				return res.status(404).json({
 					message: "Order not found!"
 				})
@@ -67,7 +67,7 @@ router.get('/:orderId', (req, res, next) => {
 router.post('/', (req, res, next) => {
 	Product.findById(req.body.productId)
 		.then(product => {
-			if(!product) {
+			if (!product) {
 				return res.status(404).json({
 					message: "Product not found!"
 				})
@@ -103,7 +103,9 @@ router.post('/', (req, res, next) => {
 
 //Delete order by id
 router.delete('/:orderId', (req, res, next) => {
-	Order.remove({ _id: req.params.orderId })
+	Order.remove({
+			_id: req.params.orderId
+		})
 		.exec()
 		.then(result => {
 			res.status(200).json({
@@ -111,7 +113,10 @@ router.delete('/:orderId', (req, res, next) => {
 				request: {
 					type: "POST",
 					url: "http://localhost:" + PORT + "/orders/",
-					body: {productId: "Id", quantity: "Number"}
+					body: {
+						productId: "Id",
+						quantity: "Number"
+					}
 				}
 			})
 		})

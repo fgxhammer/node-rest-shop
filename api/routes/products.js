@@ -15,7 +15,7 @@ const storage = multer.diskStorage({
 	}
 })
 const fileFilter = (req, file, cb) => {
-	if(file.mimetype === "image/jpeg" || file.mimetype === "image/png") {
+	if (file.mimetype === "image/jpeg" || file.mimetype === "image/png") {
 		// Accept file
 		cb(null, true)
 	} else {
@@ -26,10 +26,10 @@ const fileFilter = (req, file, cb) => {
 const upload = multer({
 	storage: storage,
 	limits: {
-		fileSize: 1024 * 1024 *5 //filesize in bytes (5Mb)
+		fileSize: 1024 * 1024 * 5 //filesize in bytes (5Mb)
 	},
 	fileFilter: fileFilter
-}) 
+})
 
 // DEV: Port constant for localhost
 const PORT = 3000
@@ -74,7 +74,7 @@ router.post('/', upload.single('productImage'), (req, res, next) => {
 		_id: new mongoose.Types.ObjectId(),
 		name: req.body.name,
 		price: req.body.price,
-		productImage:  req.file.path
+		productImage: req.file.path
 	})
 	product
 		.save()
@@ -109,7 +109,7 @@ router.get('/:productId', (req, res, next) => {
 		.select("name price _id productImage")
 		.exec()
 		.then(doc => {
-			if(doc) {
+			if (doc) {
 				res.status(200).json({
 					product: doc,
 					request: {
@@ -137,10 +137,14 @@ router.get('/:productId', (req, res, next) => {
 router.patch('/:productId', (req, res, next) => {
 	const id = req.params.productId
 	const updateOps = {}
-	for(const ops of req.body) {
+	for (const ops of req.body) {
 		updateOps[ops.propName] = ops.value
 	}
-	Product.update({ _id: id }, { $set: updateOps })
+	Product.update({
+			_id: id
+		}, {
+			$set: updateOps
+		})
 		.exec()
 		.then(result => {
 			res.status(200).json({
@@ -163,7 +167,9 @@ router.patch('/:productId', (req, res, next) => {
 // Delete producs with id
 router.delete('/:productId', (req, res, next) => {
 	const id = req.params.productId
-	Product.remove({_id: id})
+	Product.remove({
+			_id: id
+		})
 		.exec()
 		.then(result => {
 			res.status(200).json({
@@ -171,7 +177,10 @@ router.delete('/:productId', (req, res, next) => {
 				request: {
 					type: "POST",
 					url: "http://localhost:" + PORT + "/products/",
-					body: { name: "String", price: "Number"}
+					body: {
+						name: "String",
+						price: "Number"
+					}
 				}
 			})
 		})
