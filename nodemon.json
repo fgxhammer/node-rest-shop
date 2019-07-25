@@ -1,5 +1,6 @@
 {
     "env": {
-        "MONGODB_PORT": "27017"
+        "MONGODB_PORT": "27017",
+        "JWT_KEY": "secret"
     }
 }
